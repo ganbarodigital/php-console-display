@@ -67,11 +67,17 @@ class BuildTokenList
         return self::tokenizeString($input, $skipFinalEol);
     }
 
-    private static function tokenizeString($input, $skipFinalEol) {
+    private static function tokenizeString($input, $skipFinalEol)
+    {
         $retval = [];
 
         $lines = explode(PHP_EOL, $input);
         foreach ($lines as $currentLine) {
+            // skip empty lines
+            if (empty($currentLine)) {
+                continue;
+            }
+
             $retval = array_merge($retval, self::tokenizeLine($currentLine));
         }
 
@@ -91,16 +97,9 @@ class BuildTokenList
 
     private static function tokenizeLine($currentLine)
     {
-        // skip empty lines
-        if (empty($currentLine)) {
-            return [];
-        }
-
-        $regex = "#<(" . self::REGEX_TAG . "|/" . self::REGEX_TAG . ")>#";
-
-        preg_match_all($regex, $currentLine, $matches, PREG_OFFSET_CAPTURE);
-
+        $matches = self::locateFormattingTokens($currentLine);
         $currentLinePos=0;
+        $retval=[];
 
         foreach ($matches[0] as $match) {
             if ($strToken = self::buildStringTokenFromMatch($match, $currentLine, $currentLinePos)) {
@@ -114,15 +113,24 @@ class BuildTokenList
         }
 
         // at this point, we might have some more string to go
-        if ($currentLinePos < strlen($currentLine)) {
-            $retval[] = new Tokens\StringToken(substr($currentLine, $currentLinePos));
-        }
+        $retval = array_merge($retval, self::appendTrailingString($currentLine, $currentLinePos));
 
         // we need an end-of-line token
         $retval[] = new Tokens\EolToken();
 
         // all done
         return $retval;
+    }
+
+    private static function locateFormattingTokens($currentLine)
+    {
+        static $regex = null;
+        if (!$regex) {
+            $regex = "#<(" . self::REGEX_TAG . "|/" . self::REGEX_TAG . ")>#";
+        }
+        preg_match_all($regex, $currentLine, $matches, PREG_OFFSET_CAPTURE);
+
+        return $matches;
     }
 
     private static function buildStringTokenFromMatch($match, $currentLine, $currentLinePos)
@@ -142,5 +150,15 @@ class BuildTokenList
         }
 
         return new Tokens\FormattingToken($match[0]);
+    }
+
+    private static function appendTrailingString($currentLine, $currentLinePos)
+    {
+        // at this point, we might have some more string to go
+        if ($currentLinePos < strlen($currentLine)) {
+            return [ new Tokens\StringToken(substr($currentLine, $currentLinePos)) ];
+        }
+
+        return [];
     }
 }
