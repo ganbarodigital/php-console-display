@@ -1,6 +1,8 @@
 New BSD License
 ===============
 
+Copyright (c) 2010, Gradwell dot com Ltd
+Copyright (c) 2011, Stuart Herbert
 Copyright (c) 2015-present, Ganbaro Digital Ltd
 All rights reserved.
 
