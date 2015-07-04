@@ -55,18 +55,44 @@ class BuildTokenList
 {
     const REGEX_TAG="[A-Za-z0-9_-]+";
 
+    /**
+     * convert input into a list of tokens for rendering
+     *
+     * @param  mixed $input
+     *         the input to tokenize
+     * @return array
+     *         a list of tokens for rendering
+     */
     public function __invoke($input)
     {
         $methodName = FirstMethodMatchingType::fromMixed($input, get_class($this), 'from');
         return self::$methodName($input);
     }
 
+    /**
+     * convert input into a list of tokens for rendering
+     *
+     * @param  string $input
+     *         the input to tokenize
+     * @return array
+     *         a list of tokens for rendering
+     */
     public static function fromString($input)
     {
         $skipFinalEol = !self::endsWithEol($input);
         return self::tokenizeString($input, $skipFinalEol);
     }
 
+    /**
+     * convert a string into a list of tokens
+     *
+     * @param  string $input
+     *         the string to tokenize
+     * @param  boolean $skipFinalEol
+     *         do we need to add an EolToken on the end of the list?
+     * @return array
+     *         the list of tokens
+     */
     private static function tokenizeString($input, $skipFinalEol)
     {
         $retval = [];
@@ -90,25 +116,42 @@ class BuildTokenList
         return $retval;
     }
 
+    /**
+     * does the input string end with an end-of-line token
+     *
+     * @param  string $input
+     *         the string to check
+     * @return boolean
+     *         TRUE if the string ends with an end-of-line token
+     *         FALSE otherwise
+     */
     private static function endsWithEol($input)
     {
         return substr($input, 0 - strlen(PHP_EOL)) === PHP_EOL;
     }
 
+    /**
+     * tokenize a single line of text
+     *
+     * @param  string $currentLine
+     *         the line being tokenized
+     * @return array
+     *         the list of token(s) generated from the line
+     */
     private static function tokenizeLine($currentLine)
     {
         $matches = self::locateFormattingTokens($currentLine);
         $currentLinePos=0;
         $retval=[];
 
-        foreach ($matches[0] as $match) {
-            if ($strToken = self::buildStringTokenFromMatch($match, $currentLine, $currentLinePos)) {
+        foreach ($matches as $match) {
+            if ($strToken = self::buildStringTokenFromRegexMatch($match, $currentLine, $currentLinePos)) {
                 $retval[] = $strToken;
                 $currentLinePos = $currentLinePos + $strToken->getLength();
             }
 
             // now the token
-            $retval[] = self::buildFormattingTokenFromMatch($match);
+            $retval[] = self::buildFormattingTokenFromRegexMatch($match);
             $currentLinePos = $currentLinePos + strlen($match[0]);
         }
 
@@ -122,18 +165,36 @@ class BuildTokenList
         return $retval;
     }
 
-    private static function locateFormattingTokens($currentLine)
+    /**
+     * find the formatting markup in the input string
+     *
+     * @param  string $input
+     * @return array
+     */
+    private static function locateFormattingTokens($input)
     {
         static $regex = null;
         if (!$regex) {
             $regex = "#<(" . self::REGEX_TAG . "|/" . self::REGEX_TAG . ")>#";
         }
-        preg_match_all($regex, $currentLine, $matches, PREG_OFFSET_CAPTURE);
+        preg_match_all($regex, $input, $matches, PREG_OFFSET_CAPTURE);
 
-        return $matches;
+        return $matches[0];
     }
 
-    private static function buildStringTokenFromMatch($match, $currentLine, $currentLinePos)
+    /**
+     * use a regex match to extract a StringToken from the current input string
+     *
+     * @param  array $match
+     *         one of the matches found by our regex
+     * @param  string $currentLine
+     *         the input string to extract the match from
+     * @param  int $currentLinePos
+     *         how far through the string we are
+     * @return Tokens\StringToken
+     *         the generated token
+     */
+    private static function buildStringTokenFromRegexMatch($match, $currentLine, $currentLinePos)
     {
         if ($match[1] <= $currentLinePos) {
             return null;
@@ -143,7 +204,16 @@ class BuildTokenList
         return new Tokens\StringToken(substr($currentLine, $currentLinePos, $match[1] - $currentLinePos));
     }
 
-    private static function buildFormattingTokenFromMatch($match)
+    /**
+     * use a regex match to extract a FormattingToken from the current
+     * input string
+     *
+     * @param  array $match
+     *         one of the matches found by our regex
+     * @return Tokens\FormattingToken
+     *         the generated token
+     */
+    private static function buildFormattingTokenFromRegexMatch($match)
     {
         if ($match[0][1] == '/') {
             return new Tokens\FormattingToken("<none>");
@@ -152,6 +222,17 @@ class BuildTokenList
         return new Tokens\FormattingToken($match[0]);
     }
 
+    /**
+     * do we have any text after the last formatting markup in the current line?
+     * if so, generate a token for it
+     *
+     * @param  string $currentLine
+     *         the input line that we are examining
+     * @param  int $currentLinePos
+     *         how far through $currentLine we are
+     * @return array
+     *         contains zero or more tokens
+     */
     private static function appendTrailingString($currentLine, $currentLinePos)
     {
         // at this point, we might have some more string to go
