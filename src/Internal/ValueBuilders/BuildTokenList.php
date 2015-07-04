@@ -63,57 +63,16 @@ class BuildTokenList
 
     public static function fromString($input)
     {
+        $skipFinalEol = !self::endsWithEol($input);
+        return self::tokenizeString($input, $skipFinalEol);
+    }
+
+    private static function tokenizeString($input, $skipFinalEol) {
         $retval = [];
-        $regex = "#<(" . self::REGEX_TAG . "|/" . self::REGEX_TAG . ")>#";
-
-        $formatStack=[];
-
-        $skipFinalEol = false;
-        if (substr($input, 0-strlen(PHP_EOL)) !== PHP_EOL) {
-            $skipFinalEol = true;
-        }
 
         $lines = explode(PHP_EOL, $input);
         foreach ($lines as $currentLine) {
-            // skip empty lines
-            if (empty($currentLine)) {
-                continue;
-            }
-
-            preg_match_all($regex, $currentLine, $matches, PREG_OFFSET_CAPTURE);
-
-            $currentLinePos=0;
-
-            foreach ($matches[0] as $match) {
-                if ($match[1] > $currentLinePos) {
-                    // we have a string at first
-                    $strToken = new Tokens\StringToken(substr($currentLine, $currentLinePos, $match[1] - $currentLinePos));
-                    $currentLinePos = $currentLinePos + $strToken->getLength();
-                    $retval[] = $strToken;
-                }
-
-                // now the token
-                if ($match[0][1] == '/') {
-                    $formatToken = new Tokens\FormattingToken("<none>");
-                    array_pop($formatStack);
-                }
-                else {
-                    $formatToken = new Tokens\FormattingToken($match[0]);
-                    array_push($formatStack, $formatToken);
-                }
-                $currentLinePos = $currentLinePos + strlen($match[0]);
-
-                // add them to our return
-                $retval[] = $formatToken;
-            }
-
-            // at this point, we might have some more string to go
-            if ($currentLinePos < strlen($currentLine)) {
-                $retval[] = new Tokens\StringToken(substr($currentLine, $currentLinePos));
-            }
-
-            // we need an end-of-line token
-            $retval[] = new Tokens\EolToken();
+            $retval = array_merge($retval, self::tokenizeLine($currentLine));
         }
 
         // do we want to lose the last EOL token?
@@ -121,12 +80,67 @@ class BuildTokenList
             unset($retval[count($retval) - 1]);
         }
 
-        // do we have a formatting tag that needs closing?
-        if (!empty($formatStack)) {
-            $retval[] = new Tokens\FormattingToken("<none>");
+        // all done
+        return $retval;
+    }
+
+    private static function endsWithEol($input)
+    {
+        return substr($input, 0 - strlen(PHP_EOL)) === PHP_EOL;
+    }
+
+    private static function tokenizeLine($currentLine)
+    {
+        // skip empty lines
+        if (empty($currentLine)) {
+            return [];
         }
+
+        $regex = "#<(" . self::REGEX_TAG . "|/" . self::REGEX_TAG . ")>#";
+
+        preg_match_all($regex, $currentLine, $matches, PREG_OFFSET_CAPTURE);
+
+        $currentLinePos=0;
+
+        foreach ($matches[0] as $match) {
+            if ($strToken = self::buildStringTokenFromMatch($match, $currentLine, $currentLinePos)) {
+                $retval[] = $strToken;
+                $currentLinePos = $currentLinePos + $strToken->getLength();
+            }
+
+            // now the token
+            $retval[] = self::buildFormattingTokenFromMatch($match);
+            $currentLinePos = $currentLinePos + strlen($match[0]);
+        }
+
+        // at this point, we might have some more string to go
+        if ($currentLinePos < strlen($currentLine)) {
+            $retval[] = new Tokens\StringToken(substr($currentLine, $currentLinePos));
+        }
+
+        // we need an end-of-line token
+        $retval[] = new Tokens\EolToken();
 
         // all done
         return $retval;
+    }
+
+    private static function buildStringTokenFromMatch($match, $currentLine, $currentLinePos)
+    {
+        if ($match[1] <= $currentLinePos) {
+            return null;
+        }
+
+        // we have a string at first
+        return new Tokens\StringToken(substr($currentLine, $currentLinePos, $match[1] - $currentLinePos));
+    }
+
+    private static function buildFormattingTokenFromMatch($match)
+    {
+        if ($match[0][1] == '/') {
+            return new Tokens\FormattingToken("<none>");
+        }
+
+        return new Tokens\FormattingToken($match[0]);
     }
 }

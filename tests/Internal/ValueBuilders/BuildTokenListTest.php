@@ -133,7 +133,6 @@ class BuildTokenListTest extends PHPUnit_Framework_TestCase
                     new Tokens\EolToken(),
                     new Tokens\StringToken("67890"),
                     new Tokens\EolToken(),
-                    new Tokens\FormattingToken("<none>"),
                 ]
             ],
         ];
