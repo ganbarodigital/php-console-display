@@ -16,7 +16,7 @@
     },
     "autoload": {
         "psr-4": {
-            "GanbaroDigital\\Reflection\\": "src"
+            "GanbaroDigital\\ConsoleDisplay\\": "src"
         }
     }
 }
