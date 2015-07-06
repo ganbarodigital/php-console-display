@@ -50,22 +50,12 @@ namespace GanbaroDigital\ConsoleDisplay\Internal\TokenTypes;
 use GanbaroDigital\ConsoleDisplay\Exceptions\E4xx_UnsupportedType;
 use GanbaroDigital\Reflection\ValueBuilders\FirstMethodMatchingType;
 
-class IndentToken
+class SetIndentToken extends IndentToken
 {
-    /**
-     * what indent level do we want to set?
-     *
-     * @var int
-     */
-    private $indent;
+    private $indent = 0;
 
-    protected function __construct($indent)
+    public function __construct($indent)
     {
-        $this->indent = $indent;
-    }
-
-    public function getIndent()
-    {
-        return $this->indent;
+        parent::__construct($indent);
     }
 }
