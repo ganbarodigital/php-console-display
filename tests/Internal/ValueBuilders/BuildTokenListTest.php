@@ -48,7 +48,7 @@
 namespace GanbaroDigital\ConsoleDisplay\Internal\ValueBuilders;
 
 use PHPUnit_Framework_TestCase;
-use GanbaroDigital\ConsoleDisplay\Internal\Tokens;
+use GanbaroDigital\ConsoleDisplay\Internal\TokenTypes;
 
 /**
  * @coversDefaultClass GanbaroDigital\ConsoleDisplay\Internal\ValueBuilders\BuildTokenList
@@ -104,35 +104,35 @@ class BuildTokenListTest extends PHPUnit_Framework_TestCase
         return [
             [ "12345<info>67890</info>1234567890",
                 [
-                    new Tokens\StringToken("12345"),
-                    new Tokens\FormattingToken("<info>"),
-                    new Tokens\StringToken("67890"),
-                    new Tokens\FormattingToken("<none>"),
-                    new Tokens\StringToken("1234567890")
+                    new TokenTypes\StringToken("12345"),
+                    new TokenTypes\FormattingToken("<info>"),
+                    new TokenTypes\StringToken("67890"),
+                    new TokenTypes\FormattingToken("<none>"),
+                    new TokenTypes\StringToken("1234567890")
                 ]
             ],
             [ "12345" . PHP_EOL . "67890" ,
                 [
-                    new Tokens\StringToken("12345"),
-                    new Tokens\EolToken(),
-                    new Tokens\StringToken("67890"),
+                    new TokenTypes\StringToken("12345"),
+                    new TokenTypes\EolToken(),
+                    new TokenTypes\StringToken("67890"),
                 ]
             ],
             [ "12345" . PHP_EOL . "67890" . PHP_EOL,
                 [
-                    new Tokens\StringToken("12345"),
-                    new Tokens\EolToken(),
-                    new Tokens\StringToken("67890"),
-                    new Tokens\EolToken(),
+                    new TokenTypes\StringToken("12345"),
+                    new TokenTypes\EolToken(),
+                    new TokenTypes\StringToken("67890"),
+                    new TokenTypes\EolToken(),
                 ]
             ],
             [ "<info>12345" . PHP_EOL . "67890" . PHP_EOL,
                 [
-                    new Tokens\FormattingToken("<info>"),
-                    new Tokens\StringToken("12345"),
-                    new Tokens\EolToken(),
-                    new Tokens\StringToken("67890"),
-                    new Tokens\EolToken(),
+                    new TokenTypes\FormattingToken("<info>"),
+                    new TokenTypes\StringToken("12345"),
+                    new TokenTypes\EolToken(),
+                    new TokenTypes\StringToken("67890"),
+                    new TokenTypes\EolToken(),
                 ]
             ],
         ];

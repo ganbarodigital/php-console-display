@@ -45,20 +45,27 @@
  * @link      http://code.ganbarodigital.com/php-console-display
  */
 
-namespace GanbaroDigital\ConsoleDisplay\Internal\Tokens;
+namespace GanbaroDigital\ConsoleDisplay\Internal\TokenTypes;
 
 use GanbaroDigital\ConsoleDisplay\Exceptions\E4xx_UnsupportedType;
 use GanbaroDigital\Reflection\ValueBuilders\FirstMethodMatchingType;
 
-class EolToken extends StringToken
+class FormattingToken
 {
-    public function __construct()
+    protected $data = '';
+
+    public function __construct($data)
     {
-        parent::__construct(PHP_EOL);
+        $this->data = $data;
     }
 
     public function getLength()
     {
         return 0;
+    }
+
+    public function __toString()
+    {
+        return $this->data;
     }
 }

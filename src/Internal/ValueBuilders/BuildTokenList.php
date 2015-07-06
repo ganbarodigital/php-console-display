@@ -48,7 +48,7 @@
 namespace GanbaroDigital\ConsoleDisplay\Internal\ValueBuilders;
 
 use GanbaroDigital\ConsoleDisplay\Exceptions\E4xx_UnsupportedType;
-use GanbaroDigital\ConsoleDisplay\Internal\Tokens;
+use GanbaroDigital\ConsoleDisplay\Internal\TokenTypes;
 use GanbaroDigital\Reflection\ValueBuilders\FirstMethodMatchingType;
 
 class BuildTokenList
@@ -56,12 +56,12 @@ class BuildTokenList
     const REGEX_TAG="[A-Za-z0-9_-]+";
 
     /**
-     * convert input into a list of tokens for rendering
+     * convert input into a list of TokenTypes for rendering
      *
      * @param  mixed $input
      *         the input to tokenize
      * @return array
-     *         a list of tokens for rendering
+     *         a list of TokenTypes for rendering
      */
     public function __invoke($input)
     {
@@ -70,12 +70,12 @@ class BuildTokenList
     }
 
     /**
-     * convert input into a list of tokens for rendering
+     * convert input into a list of TokenTypes for rendering
      *
      * @param  string $input
      *         the input to tokenize
      * @return array
-     *         a list of tokens for rendering
+     *         a list of TokenTypes for rendering
      */
     public static function fromString($input)
     {
@@ -84,14 +84,14 @@ class BuildTokenList
     }
 
     /**
-     * convert a string into a list of tokens
+     * convert a string into a list of TokenTypes
      *
      * @param  string $input
      *         the string to tokenize
      * @param  boolean $skipFinalEol
      *         do we need to add an EolToken on the end of the list?
      * @return array
-     *         the list of tokens
+     *         the list of TokenTypes
      */
     private static function tokenizeString($input, $skipFinalEol)
     {
@@ -140,7 +140,7 @@ class BuildTokenList
      */
     private static function tokenizeLine($currentLine)
     {
-        $matches = self::locateFormattingTokens($currentLine);
+        $matches = self::locateFormattingTokenTypes($currentLine);
         $currentLinePos=0;
         $retval=[];
 
@@ -159,7 +159,7 @@ class BuildTokenList
         $retval = array_merge($retval, self::appendTrailingString($currentLine, $currentLinePos));
 
         // we need an end-of-line token
-        $retval[] = new Tokens\EolToken();
+        $retval[] = new TokenTypes\EolToken();
 
         // all done
         return $retval;
@@ -171,7 +171,7 @@ class BuildTokenList
      * @param  string $input
      * @return array
      */
-    private static function locateFormattingTokens($input)
+    private static function locateFormattingTokenTypes($input)
     {
         static $regex = null;
         if (!$regex) {
@@ -191,7 +191,7 @@ class BuildTokenList
      *         the input string to extract the match from
      * @param  int $currentLinePos
      *         how far through the string we are
-     * @return Tokens\StringToken
+     * @return TokenTypes\StringToken
      *         the generated token
      */
     private static function buildStringTokenFromRegexMatch($match, $currentLine, $currentLinePos)
@@ -201,7 +201,7 @@ class BuildTokenList
         }
 
         // we have a string at first
-        return new Tokens\StringToken(substr($currentLine, $currentLinePos, $match[1] - $currentLinePos));
+        return new TokenTypes\StringToken(substr($currentLine, $currentLinePos, $match[1] - $currentLinePos));
     }
 
     /**
@@ -210,16 +210,16 @@ class BuildTokenList
      *
      * @param  array $match
      *         one of the matches found by our regex
-     * @return Tokens\FormattingToken
+     * @return TokenTypes\FormattingToken
      *         the generated token
      */
     private static function buildFormattingTokenFromRegexMatch($match)
     {
         if ($match[0][1] == '/') {
-            return new Tokens\FormattingToken("<none>");
+            return new TokenTypes\FormattingToken("<none>");
         }
 
-        return new Tokens\FormattingToken($match[0]);
+        return new TokenTypes\FormattingToken($match[0]);
     }
 
     /**
@@ -231,13 +231,13 @@ class BuildTokenList
      * @param  int $currentLinePos
      *         how far through $currentLine we are
      * @return array
-     *         contains zero or more tokens
+     *         contains zero or more TokenTypes
      */
     private static function appendTrailingString($currentLine, $currentLinePos)
     {
         // at this point, we might have some more string to go
         if ($currentLinePos < strlen($currentLine)) {
-            return [ new Tokens\StringToken(substr($currentLine, $currentLinePos)) ];
+            return [ new TokenTypes\StringToken(substr($currentLine, $currentLinePos)) ];
         }
 
         return [];
