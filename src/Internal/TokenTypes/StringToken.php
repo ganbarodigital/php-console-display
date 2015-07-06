@@ -47,7 +47,6 @@
 
 namespace GanbaroDigital\ConsoleDisplay\Internal\TokenTypes;
 
-use GanbaroDigital\ConsoleDisplay\Exceptions\E4xx_UnsupportedType;
 use GanbaroDigital\Reflection\ValueBuilders\FirstMethodMatchingType;
 
 class StringToken
