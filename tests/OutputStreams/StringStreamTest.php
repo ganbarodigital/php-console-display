@@ -49,6 +49,9 @@ namespace GanbaroDigital\ConsoleDisplay\OutputStreams;
 
 use PHPUnit_Framework_TestCase;
 use GanbaroDigital\ConsoleDisplay\Internal\TokenProcessors\PassthruProcessor;
+use GanbaroDigital\ConsoleDisplay\Internal\TokenTypes;
+use GanbaroDigital\ConsoleDisplay\Themes\InMemoryTheme;
+use GanbaroDigital\ConsoleDisplay\ValueBuilders\BuildTheme;
 
 /**
  * @coversDefaultClass GanbaroDigital\ConsoleDisplay\OutputStreams\StringStream
@@ -77,4 +80,103 @@ class StringStreamTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($obj instanceof StringStream);
     }
 
+    /**
+     * @covers ::writePartialLine
+     */
+    public function testCanWritePartialLine()
+    {
+        // ----------------------------------------------------------------
+        // setup your test
+
+        $buffer = "";
+        $tokenProcessor = new PassthruProcessor();
+        $stream = new StringStream($buffer, $tokenProcessor);
+        $theme = $this->buildEmptyTheme();
+
+        $expectedResult = "hello, world";
+        $tokens = [
+            new TokenTypes\StringToken($expectedResult)
+        ];
+
+        // ----------------------------------------------------------------
+        // perform the change
+
+        $stream->writePartialLine($theme, $tokens);
+
+        // ----------------------------------------------------------------
+        // test the results
+
+        $this->assertEquals($expectedResult, $buffer);
+    }
+
+    /**
+     * @covers ::writeFullLine
+     */
+    public function testCanWriteFullLine()
+    {
+        // ----------------------------------------------------------------
+        // setup your test
+
+        $buffer = "";
+        $tokenProcessor = new PassthruProcessor();
+        $stream = new StringStream($buffer, $tokenProcessor);
+        $theme = $this->buildEmptyTheme();
+
+        $data = "hello, world!";
+        $expectedResult = $data . PHP_EOL;
+        $tokens = [
+            new TokenTypes\StringToken($data),
+            new TokenTypes\EolToken()
+        ];
+
+        // ----------------------------------------------------------------
+        // perform the change
+
+        $stream->writeFullLine($theme, $tokens);
+
+        // ----------------------------------------------------------------
+        // test the results
+
+        $this->assertEquals($expectedResult, $buffer);
+    }
+
+    /**
+     * @covers ::writeFullLine
+     */
+    public function testCanIndentOutput()
+    {
+        // ----------------------------------------------------------------
+        // setup your test
+
+        $buffer = "";
+        $tokenProcessor = new PassthruProcessor();
+        $stream = new StringStream($buffer, $tokenProcessor);
+        $theme = $this->buildEmptyTheme();
+
+        $data[0] = "hello, world!";
+        $data[1] = "goodbye for now!";
+        $expectedResult = $data[0] . PHP_EOL . "      " . $data[1] . PHP_EOL;
+        $tokens = [
+            new TokenTypes\StringToken($data[0]),
+            new TokenTypes\EolToken(),
+            new TokenTypes\SetIndentToken(6),
+            new TokenTypes\StringToken($data[1]),
+        ];
+
+        // ----------------------------------------------------------------
+        // perform the change
+
+        $stream->writeFullLine($theme, $tokens);
+
+        // ----------------------------------------------------------------
+        // test the results
+
+        $this->assertEquals($expectedResult, $buffer);
+    }
+
+
+    protected function buildEmptyTheme()
+    {
+        return BuildTheme::fromArray([]);
+    }
 }
