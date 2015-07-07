@@ -48,13 +48,13 @@
 namespace GanbaroDigital\ConsoleDisplay\OutputStreams;
 
 use GanbaroDigital\ConsoleDisplay\Exceptions\E4xx_UnsupportedType;
-use GanbaroDigital\ConsoleDisplay\Internal\OutputStreams\LowLevelPhpStreamStream;
+use GanbaroDigital\ConsoleDisplay\Internal\OutputStreams\PhpStreamWriter;
 
 class PhpStreamStream extends BaseStream implements OutputStream
 {
     public function __construct($stream, $wrapPlugin)
     {
-        $lowLevelStream = new LowLevelPhpStreamStream($stream);
+        $lowLevelStream = new PhpStreamWriter($stream);
         parent::__construct($lowLevelStream, $wrapPlugin);
     }
 }
