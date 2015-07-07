@@ -36,7 +36,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @category  Libraries
- * @package   ConsoleDisplay/OutputStreams
+ * @package   ConsoleDisplay\OutputStreams
  * @author    Stuart Herbert <stuherbert@ganbarodigital.com>
  * @copyright 2010 Gradwell dot com Ltd www.gradwell.com
  * @copyright 2011 Stuart Herbert www.stuartherbert.com
@@ -47,23 +47,34 @@
 
 namespace GanbaroDigital\ConsoleDisplay\OutputStreams;
 
-use GanbaroDigital\ConsoleDisplay\Internal\TokenProcessors\TokenProcessor;
-use GanbaroDigital\ConsoleDisplay\Internal\OutputWriters\StringWriter;
-use GanbaroDigital\ConsoleDisplay\Internal\OutputWriters\WrappedWriter;
+use PHPUnit_Framework_TestCase;
+use GanbaroDigital\ConsoleDisplay\Internal\TokenProcessors\PassthruProcessor;
 
-class StringStream extends BaseStream implements OutputStream
+/**
+ * @coversDefaultClass GanbaroDigital\ConsoleDisplay\OutputStreams\StringStream
+ */
+class StringStreamTest extends PHPUnit_Framework_TestCase
 {
     /**
-     * our constructor
-     *
-     * @param string &$buffer
-     *        the buffer that we are going to append to
-     * @param TokenProcessor $tokenProcessor
-     *        your preferred token processor
+     * @coversNothing
      */
-    public function __construct(&$buffer, TokenProcessor $tokenProcessor)
+    public function testCanInstantiate()
     {
-        $writer = new WrappedWriter(new StringWriter($buffer));
-        parent::__construct($buffer, $tokenProcessor);
+        // ----------------------------------------------------------------
+        // setup your test
+
+        $buffer="";
+        $tokenProcessor = new PassthruProcessor;
+
+        // ----------------------------------------------------------------
+        // perform the change
+
+        $obj = new StringStream($buffer, $tokenProcessor);
+
+        // ----------------------------------------------------------------
+        // test the results
+
+        $this->assertTrue($obj instanceof StringStream);
     }
+
 }
