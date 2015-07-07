@@ -74,7 +74,7 @@ class StringWriter implements OutputWriter
             throw new E4xx_UnsupportedType(gettype($buffer));
         }
 
-        $this->buffer = $buffer;
+        $this->buffer = &$buffer;
     }
 
     /**
