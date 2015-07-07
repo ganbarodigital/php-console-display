@@ -45,7 +45,7 @@
  * @link      http://code.ganbarodigital.com/php-console-display
  */
 
-namespace GanbaroDigital\ConsoleDisplay\Internal\OutputStreams;
+namespace GanbaroDigital\ConsoleDisplay\Internal\OutputWriters;
 
 interface OutputWriter
 {
