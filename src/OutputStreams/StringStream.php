@@ -64,6 +64,6 @@ class StringStream extends BaseStream implements OutputStream
     public function __construct(&$buffer, TokenProcessor $tokenProcessor)
     {
         $writer = new WrappedWriter(new StringWriter($buffer));
-        parent::__construct($buffer, $tokenProcessor);
+        parent::__construct($writer, $tokenProcessor);
     }
 }
