@@ -103,6 +103,28 @@ class BuildThemeTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($actualResult instanceof Theme);
     }
 
+    /**
+     * @covers ::fromArray
+     */
+    public function testCanBuildAnEmptyTheme()
+    {
+        // ----------------------------------------------------------------
+        // setup your test
+
+        $themeDef = [];
+
+        // ----------------------------------------------------------------
+        // perform the change
+
+        $theme = BuildTheme::fromArray($themeDef);
+
+        // ----------------------------------------------------------------
+        // test the results
+
+        $this->assertTrue($theme instanceof Theme);
+    }
+
+
     public function provideThemes()
     {
         return [
