@@ -47,6 +47,9 @@
 
 namespace GanbaroDigital\ConsoleDisplay\OutputStreams;
 
+use GanbaroDigital\ConsoleDisplay\Internal\OutputWriters\OutputWriter;
+use GanbaroDigital\ConsoleDisplay\Internal\TokenProcessors\TokenProcessor;
+
 class BaseStream
 {
     /**
@@ -64,7 +67,7 @@ class BaseStream
 
     private $fred;
 
-    public function __construct($writer, $tokenProcessor)
+    public function __construct(OutputWriter $writer, TokenProcessor $tokenProcessor)
     {
         $this->writer = $writer;
         $this->tokenProcessor = $tokenProcessor;
@@ -72,13 +75,10 @@ class BaseStream
 
     public function writePartialLine($theme, $tokens)
     {
-        $tokens = (array)$tokens;
-        foreach ($tokens as $token) {
-            $this->tokenProcessor->writeContent($this->writer, $theme, $tokens);
-        }
+        $this->tokenProcessor->writePartialLine($this->writer, $theme, $tokens);
     }
 
-    public function writeFullLine($theme, $token)
+    public function writeFullLine($theme, $tokens)
     {
         $this->tokenProcessor->writeFullLine($this->writer, $theme, $tokens);
     }
