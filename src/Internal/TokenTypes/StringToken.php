@@ -47,24 +47,51 @@
 
 namespace GanbaroDigital\ConsoleDisplay\Internal\TokenTypes;
 
-use GanbaroDigital\Reflection\ValueBuilders\FirstMethodMatchingType;
-
-class StringToken
+class StringToken implements Token
 {
-    protected $data = '';
+    /**
+     * the content that we are going to output
+     *
+     * @var string
+     */
+    protected $content = '';
 
-    public function __construct($data)
+    /**
+     * create a value object that wraps the content that we want to output
+     *
+     * the best way to create one of these tokens is via the BuildTokenList
+     * value builder
+     *
+     * if you are building these tokens by hand, please make sure that your
+     * content does not include end-of-line markers. You should use the
+     * EolToken for those.
+     *
+     * @param string $content
+     *        the content that we want to output
+     */
+    public function __construct($content)
     {
-        $this->data = $data;
+        $this->content = $content;
     }
 
-    public function getLength()
+    /**
+     * if this token is sent to an OutputWriter's writeContent(), how far
+     * along the current line does this token move the cursor?
+     *
+     * @return int
+     */
+    public function getContentLength()
     {
-        return strlen($this->data);
+        return strlen($this->content);
     }
 
+    /**
+     * get the token's output as a string
+     *
+     * @return string
+     */
     public function __toString()
     {
-        return $this->data;
+        return $this->content;
     }
 }

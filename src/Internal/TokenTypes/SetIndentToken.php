@@ -52,8 +52,13 @@ use GanbaroDigital\Reflection\ValueBuilders\FirstMethodMatchingType;
 
 class SetIndentToken extends IndentToken
 {
-    private $indent = 0;
-
+    /**
+     * creates a value object, that tells our output stream how much to
+     * indent subsequent lines of text
+     *
+     * @param int $indent
+     *        the amount of indentation to use
+     */
     public function __construct($indent)
     {
         parent::__construct($indent);

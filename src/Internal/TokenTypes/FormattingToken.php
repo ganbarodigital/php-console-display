@@ -50,7 +50,7 @@ namespace GanbaroDigital\ConsoleDisplay\Internal\TokenTypes;
 use GanbaroDigital\ConsoleDisplay\Exceptions\E4xx_UnsupportedType;
 use GanbaroDigital\Reflection\ValueBuilders\FirstMethodMatchingType;
 
-class FormattingToken
+class FormattingToken extends Token
 {
     protected $data = '';
 
@@ -59,7 +59,7 @@ class FormattingToken
         $this->data = $data;
     }
 
-    public function getLength()
+    public function getContentLength()
     {
         return 0;
     }

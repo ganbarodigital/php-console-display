@@ -52,12 +52,25 @@ use GanbaroDigital\Reflection\ValueBuilders\FirstMethodMatchingType;
 
 class EolToken extends StringToken
 {
-    public function __construct()
+    /**
+     * creates a value object that tells our output writers to write
+     * an end-of-line marker
+     *
+     * @param string $eolMarker
+     *        the end-of-line marker to use
+     */
+    public function __construct($eolMarker = PHP_EOL)
     {
-        parent::__construct(PHP_EOL);
+        parent::__construct($eolMarker);
     }
 
-    public function getLength()
+    /**
+     * if this token is sent to an OutputWriter's writeContent(), how far
+     * along the current line does this token move the cursor?
+     *
+     * @return int
+     */
+    public function getContentLength()
     {
         return 0;
     }

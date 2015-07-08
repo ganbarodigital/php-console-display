@@ -47,10 +47,7 @@
 
 namespace GanbaroDigital\ConsoleDisplay\Internal\TokenTypes;
 
-use GanbaroDigital\ConsoleDisplay\Exceptions\E4xx_UnsupportedType;
-use GanbaroDigital\Reflection\ValueBuilders\FirstMethodMatchingType;
-
-class IndentToken
+class IndentToken extends MetadataToken
 {
     /**
      * what indent level do we want to set?
@@ -59,11 +56,25 @@ class IndentToken
      */
     private $indent;
 
+    /**
+     * creates a value object that influences how much to indent subsequent
+     * lines of text
+     *
+     * can be an absolute value, or a relative value
+     *
+     * @param int $indent
+     *        the indentation amount
+     */
     protected function __construct($indent)
     {
         $this->indent = $indent;
     }
 
+    /**
+     * returns the amount of indentation
+     *
+     * @return int
+     */
     public function getIndent()
     {
         return $this->indent;

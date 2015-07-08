@@ -52,8 +52,16 @@ use GanbaroDigital\Reflection\ValueBuilders\FirstMethodMatchingType;
 
 class AdjustIndentToken extends IndentToken
 {
-    private $indent = 0;
-
+    /**
+     * creates a value object, that tells our output stream how much to
+     * change the indentation of subsequent lines of text
+     *
+     * positive values increase the indentation
+     * negative values decrease the indentation
+     *
+     * @param int $indent
+     *        the adjustment to the indentation
+     */
     public function __construct($indent)
     {
         parent::__construct($indent);
