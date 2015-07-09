@@ -65,8 +65,6 @@ class BaseStream
      */
     private $writer;
 
-    private $fred;
-
     public function __construct(OutputWriter $writer, TokenProcessor $tokenProcessor)
     {
         $this->writer = $writer;
