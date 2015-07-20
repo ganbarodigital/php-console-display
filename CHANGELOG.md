@@ -6,3 +6,4 @@
 
 * ValueBuilders\DetermineTerminalWidthUsingEnvironment
 * ValueBuilders\DetermineTerminalWidthUsingNcurses
+* ValueBuilders\DetermineTerminalWidthUsingTput
