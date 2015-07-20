@@ -5,3 +5,4 @@
 ### New
 
 * ValueBuilders\DetermineTerminalWidthUsingEnvironment
+* ValueBuilders\DetermineTerminalWidthUsingNcurses
