@@ -36,7 +36,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @category  Libraries
- * @package   ConsoleDisplay/ValueBuilders
+ * @package   ConsoleDisplay\ValueBuilders
  * @author    Stuart Herbert <stuherbert@ganbarodigital.com>
  * @copyright 2010 Gradwell dot com Ltd www.gradwell.com
  * @copyright 2011 Stuart Herbert www.stuartherbert.com
@@ -47,62 +47,64 @@
 
 namespace GanbaroDigital\ConsoleDisplay\ValueBuilders;
 
-use GanbaroDigital\ConsoleDisplay\Exceptions\E4xx_UnsupportedType;
-use GanbaroDigital\ConsoleDisplay\Checks\IsTty;
-use GanbaroDigital\ProcessRunner\Checks\DidProcessFail;
-use GanbaroDigital\ProcessRunner\ProcessRunners\PopenProcessRunner;
-use GanbaroDigital\Reflection\ValueBuilders\SimpleType;
+use PHPUnit_Framework_TestCase;
 
-class DetermineTerminalWidthUsingTput
+use GanbaroDigital\ConsoleDisplay\ColourCharts\ClassicColourChart as Classic;
+use GanbaroDigital\ConsoleDisplay\ColourCharts\TwoFiveSixColourChart as HiDef;
+use GanbaroDigital\ConsoleDisplay\Themes\Theme;
+use GanbaroDigital\ConsoleDisplay\Themes\InMemoryTheme;
+
+/**
+ * @coversDefaultClass GanbaroDigital\ConsoleDisplay\ValueBuilders\DetermineTerminalWidthUsingTput
+ */
+class DetermineTerminalWidthUsingTputTest extends PHPUnit_Framework_TestCase
 {
     /**
-     * how wide is our terminal? can the tput command help?
-     *
-     * @param  resource $fp
-     *         the terminal we are connected to
-     * @return int|null
-     *         null if we are not connected to a real terminal
-     *         null if tput cannot help
-     *         the terminal width otherwise
+     * @coversNothing
      */
-    public static function fromFileHandle($fp)
+    public function testCanInstantiate()
     {
-        // no point if we are not connected to a real terminal
-        if (!IsTty::checkFileHandle($fp)) {
-            return null;
-        }
+        // ----------------------------------------------------------------
+        // setup your test
 
-        return self::getScreenWidthFromTput();
+
+
+        // ----------------------------------------------------------------
+        // perform the change
+
+        $obj = new DetermineTerminalWidthUsingTput;
+
+        // ----------------------------------------------------------------
+        // test the results
+
+        $this->assertTrue($obj instanceof DetermineTerminalWidthUsingTput);
     }
 
     /**
-     * ask tput how wide the screen is
-     *
-     * @return int|null
+     * @covers ::__invoke
      */
-    private static function getScreenWidthFromTput()
+    public function testCanUseAsObject()
     {
-        $command = [ 'tput', 'cols'];
-        $result = PopenProcessRunner::run($command);
-        if (DidProcessFail::check($result)) {
-            return null;
+        // ----------------------------------------------------------------
+        // setup your test
+
+        $obj = new DetermineTerminalWidthUsingTput;
+
+        // ----------------------------------------------------------------
+        // perform the change
+
+        $actualResult = $obj(STDIN);
+
+        // ----------------------------------------------------------------
+        // test the results
+
+        if (posix_isatty(STDIN)) {
+            $this->assertTrue(is_int($actualResult));
+            $this->assertTrue($actualResult > 0);
         }
-
-        return intval(rtrim($result->getOutput()));
+        else {
+            $this->assertNull($actualResult);
+        }
     }
 
-    /**
-     * how wide is our terminal? can the tput command help?
-     *
-     * @param  resource $fp
-     *         the terminal we are connected to
-     * @return int|null
-     *         null if we are not connected to a real terminal
-     *         null if tput cannot help
-     *         the terminal width otherwise
-     */
-    public function __invoke($fp)
-    {
-        return self::fromFileHandle($fp);
-    }
 }

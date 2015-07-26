@@ -10,7 +10,8 @@
         "ganbarodigital/php-data-containers": "^2.1",
         "ganbarodigital/php-exceptions": "^1.0",
         "ganbarodigital/php-reflection": "^2.2",
-        "ganbarodigital/php-token-streams": "^1.0"
+        "ganbarodigital/php-token-streams": "^1.0",
+        "ganbarodigital/php-process-runner": "^0.1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^4.6",
