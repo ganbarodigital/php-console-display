@@ -36,7 +36,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @category  Libraries
- * @package   ConsoleDisplay/Consoles
+ * @package   ConsoleDisplay\Consoles
  * @author    Stuart Herbert <stuherbert@ganbarodigital.com>
  * @copyright 2010 Gradwell dot com Ltd www.gradwell.com
  * @copyright 2011 Stuart Herbert www.stuartherbert.com
@@ -47,7 +47,36 @@
 
 namespace GanbaroDigital\ConsoleDisplay\Consoles;
 
-interface Console
+use PHPUnit_Framework_TestCase;
+
+use GanbaroDigital\ConsoleDisplay\ColourCharts\ClassicColourChart as Classic;
+use GanbaroDigital\ConsoleDisplay\ColourCharts\TwoFiveSixColourChart as HiDef;
+use GanbaroDigital\ConsoleDisplay\Themes\Theme;
+use GanbaroDigital\ConsoleDisplay\Themes\InMemoryTheme;
+
+/**
+ * @coversDefaultClass GanbaroDigital\ConsoleDisplay\Consoles\TerminalConsole
+ */
+class TerminalConsoleTest extends PHPUnit_Framework_TestCase
 {
-    public function write($item);
+    /**
+     * @coversNothing
+     */
+    public function testCanInstantiate()
+    {
+        // ----------------------------------------------------------------
+        // setup your test
+
+
+
+        // ----------------------------------------------------------------
+        // perform the change
+
+        $obj = new TerminalConsole;
+
+        // ----------------------------------------------------------------
+        // test the results
+
+        $this->assertTrue($obj instanceof TerminalConsole);
+    }
 }

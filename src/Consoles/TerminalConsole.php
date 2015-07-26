@@ -47,9 +47,135 @@
 
 namespace GanbaroDigital\ConsoleDisplay\Consoles;
 
-use GanbaroDigital\ConsoleDisplay\Internal\Consoles\BaseConsole;
+use GanbaroDigital\ConsoleDisplay\Internal\StreamComponents\ConsoleStreamHead;
+use GanbaroDigital\ConsoleDisplay\Internal\StreamComponents\ConsoleStreamState;
+use GanbaroDigital\ConsoleDisplay\Internal\TokenProcessors\IndentProcessor;
+use GanbaroDigital\ConsoleDisplay\Internal\TokenProcessors\ThemeProcessor;
+use GanbaroDigital\ConsoleDisplay\Internal\TokenProcessors\WordWrapProcessor;
+use GanbaroDigital\ConsoleDisplay\Internal\Tokenisers\FormattingTokeniser;
+use GanbaroDigital\ConsoleDisplay\OutputWriters\StdoutWriter;
+use GanbaroDigital\ConsoleDisplay\OutputWriters\StderrWriter;
+use GanbaroDigital\ConsoleDisplay\Themes\Theme;
+use GanbaroDigital\ConsoleDisplay\ValueBuilders\DetermineWordWrapColumn;
 
 class TerminalConsole implements Console
 {
+    private $streamState;
+    private $stdoutStream;
+    private $stderrStream;
 
+    /**
+     * create a console that writes to the user's current Terminal
+     *
+     * @param Theme $theme
+     *        the theme to use for formatting support
+     */
+    public function __construct(Theme $theme = null)
+    {
+        // this will keep track of the state of our stream
+        $this->streamState = new ConsoleStreamState($theme);
+        $this->streamState->wrapAt = DetermineWordWrapColumn::fromFileHandle(STDIN);
+
+        // we create one stream for normal output, and one for errors
+        $this->stdoutStream = $this->setupStdoutStream();
+        $this->stderrStream = $this->setupStderrStream();
+    }
+
+    /**
+     * create a new token stream, attached to stdout
+     *
+     * @return ConsoleStream
+     */
+    private function setupStdoutStream()
+    {
+        return new ConsoleStreamHead(
+            $this->streamState,
+            new FormattingTokeniser,
+            [
+                new IndentProcessor,
+                new WordWrapProcessor,
+                new ThemeProcessor,
+            ],
+            new StdoutWriter
+        );
+    }
+
+    /**
+     * create a new token stream, attached to stderr
+     *
+     * @return ConsoleStream
+     */
+    private function setupStderrStream()
+    {
+        return new ConsoleStreamHead(
+            $this->streamState,
+            new FormattingTokeniser,
+            [
+                new IndentProcessor,
+                new WordWrapProcessor,
+                new ThemeProcessor,
+            ],
+            new StderrWriter
+        );
+    }
+
+    /**
+     * write output to the console's stdout
+     *
+     * this method will automatically convert embedded formatting into
+     * the theme's console colours
+     *
+     * @param  mixed $item
+     *         the output to write to the console
+     * @return void
+     */
+    public function write($item)
+    {
+        $this->stdoutStream->write($item);
+    }
+
+    /**
+     * write output to the console's stderr
+     *
+     * this method will automatically convert embedded formatting into
+     * the theme's console colours
+     *
+     * @param  mixed $item
+     *         the output to write to the console
+     * @return void
+     */
+    public function writeError($item)
+    {
+        $this->stderrStream->write($item);
+    }
+
+    /**
+     * change the amount of indentation that occurs after every new line
+     *
+     * negative amounts will decrease the amount of indentation, and positive
+     * amounts will increase the amount of indentation.
+     *
+     * if you decrease the amount of indentation too much, this method will
+     * automatically handle it by setting the indentation to zero
+     *
+     * @param  int $amount
+     *         the amount of adjustment to make
+     * @return void
+     */
+    public function adjustIndentation($amount)
+    {
+        $this->stdoutStream->write(new AdjustIndentToken($amount));
+    }
+
+    /**
+     * set the amount of indentation that occurs after every new line
+     *
+     * @param  int $amount
+     *         the amount to set the indentation to
+     * @return void
+     */
+    public function setIndentation($amount)
+    {
+        $this->stdoutStream->write(new SetIndentToken($amount));
+    }
 }
